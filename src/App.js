@@ -1,37 +1,25 @@
 import "./App.css";
-import { useEffect, useState } from "react";
 import Nav from "./componet/Nav.jsx";
+import useFetch from "./hooks/useFetch.js";
 
 /////////////////////////////////////////////////////////////
 function App() {
-  const [countries, setCountries] = useState([]);
-  async function RetriveCountry(link) {
-    try {
-      const fetchLink = await fetch(link);
-      const Data = await fetchLink.json();
-      setCountries(Data);
-    } catch (error) {}
-  }
-  useEffect(() => {
-    return () => {
-      RetriveCountry("https://restcountries.com/v3.1/all");
-    };
-  }, []);
-  return (
-    <div>
+  const [data, error, loading] = useFetch("https://restcountries.com/v3.1/all");
+  if (data) {
+    return (
       <section>
         <Nav
           onkeyup={(ex) => {
             if (ex !== "") {
-              RetriveCountry(`https://restcountries.com/v3.1/name/${ex}`);
+              // useFetch(`https://restcountries.com/v3.1/name/${ex}`);
             }
           }}
           click={(e) => {
-            RetriveCountry(`https://restcountries.com/v3.1/region/${e}`);
+            // useFetch(`https://restcountries.com/v3.1/region/${e}`);
           }}
         />
-        {countries.length > 0 &&
-          countries.map((value) => {
+        {data.length > 0 &&
+          data.map((value) => {
             return (
               <article key={value.area + value.name.common}>
                 <div className="img-div">
@@ -47,8 +35,12 @@ function App() {
             );
           })}
       </section>
-    </div>
-  );
+    );
+  } else if (error) {
+    return <section>{error}</section>;
+  } else if (loading) {
+    return <section>lodiang .....</section>;
+  }
 }
 
 export default App;
